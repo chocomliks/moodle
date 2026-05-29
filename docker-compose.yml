@@ -1,0 +1,26 @@
+services:
+  mariadb:
+    image: mariadb:10.6
+    environment:
+      - MARIADB_USER=moodleuser
+      - MARIADB_DATABASE=moodle
+      - MARIADB_PASSWORD=${MOODLE_DB_PASS}
+      - MARIADB_ROOT_PASSWORD=${MOODLE_ROOT_PASS}
+    volumes:
+      - 'mariadb_data:/var/lib/mysql'
+      
+  moodle:
+    image: moodlehq/moodle-php-apache:8.1 # Moodle 공식 제공 PHP 환경
+    ports:
+      - '8001:80' # Apache 기본 포트인 80으로 연결
+    volumes:
+      - './:/var/www/html' # 클론받은 소스코드를 Apache 웹루트에 마운트
+      - 'moodledata_data:/var/www/moodledata' # 무들 데이터 폴더
+    depends_on:
+      - mariadb
+      
+volumes:
+  mariadb_data:
+    driver: local
+  moodledata_data:
+    driver: local
